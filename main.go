@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	"github.com/joho/godotenv"
 )
 
 type AccessLog struct {
@@ -36,7 +37,15 @@ var stats = make(map[string]*Stats)
 var globalStats = &Stats{MinTime: 999999999}
 
 func main() {
-	logFile := "/var/log/apache2/events-access.log"
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	logFile := os.Getenv("LOGDIR")
+	if logFile == "" {
+		log.Fatal("Not read ENV")
+	}
 
 	file, err := os.Open(logFile)
 	if err != nil {
@@ -166,7 +175,7 @@ func printStats() {
 		globalStats.SlowRequests)
 
 	fmt.Println("\nパス別統計 (Top 10):")
-	
+
 	// パス別でソートして上位10件を表示
 	type PathStat struct {
 		Path string
@@ -176,7 +185,7 @@ func printStats() {
 	for path, stat := range stats {
 		pathStats = append(pathStats, PathStat{path, stat})
 	}
-	
+
 	// リクエスト数でソート
 	for i := 0; i < len(pathStats); i++ {
 		for j := i + 1; j < len(pathStats); j++ {
@@ -185,18 +194,18 @@ func printStats() {
 			}
 		}
 	}
-	
+
 	limit := 10
 	if len(pathStats) < limit {
 		limit = len(pathStats)
 	}
-	
+
 	for i := 0; i < limit; i++ {
 		path := pathStats[i].Path
 		stat := pathStats[i].Stat
 		avg := float64(stat.TotalTime) / float64(stat.Count) / 1000.0
 		fmt.Printf("  %s: 回数=%d, 平均=%.2f ms, 最大=%.2f ms, 最小=%.2f ms\n",
-			path, stat.Count, avg, 
+			path, stat.Count, avg,
 			float64(stat.MaxTime)/1000.0,
 			float64(stat.MinTime)/1000.0)
 	}
