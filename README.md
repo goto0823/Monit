@@ -1,6 +1,6 @@
 # Monit
 
-Apache/Nginxのアクセスログをリアルタイムで監視し、レスポンスタイムを分析するツールです。
+Apache/Nginxのアクセスログをリアルタイムで監視し、レスポンスタイムを分析する**開発環境用**ツールです。
 
 ## 機能
 
@@ -15,49 +15,85 @@ Apache/Nginxのアクセスログをリアルタイムで監視し、レスポ�
 
 ## 必要要件
 
-- Go 1.16以上
+### Goのインストール
+
+このツールを使うには**Go**が必要です。Goを初めて使う方は以下の手順でインストールしてください。
+
+#### macOS
+```bash
+brew install go
+```
+
+#### Ubuntu/Debian
+```bash
+sudo apt update
+sudo apt install golang-go
+```
+
+#### Windows
+[公式サイト](https://go.dev/dl/)からインストーラーをダウンロードして実行してください。
+
+インストール後、以下のコマンドでバージョンを確認できます：
+```bash
+go version
+```
+
+**必要なバージョン**: Go 1.16以上
 
 ## セットアップ
 
-1. リポジトリのクローン
+### 1. リポジトリのクローン
 ```bash
 git clone https://github.com/goto0823/Monit.git
 cd Monit
 ```
 
-2. 依存関係のインストール
-```bash
-go mod download
-```
-
-3. 環境変数の設定
+### 2. 環境変数の設定
 
 `.env.example`をコピーして`.env`ファイルを作成します：
 ```bash
 cp .env.example .env
 ```
 
-`.env`ファイルを編集してログファイルのパスを設定：
+`.env`ファイルをテキストエディタで開き、監視したいログファイルのパスを設定します：
+
+**Apache の場合**
 ```
 LOGDIR=/var/log/apache2/access.log
 ```
 
-または
+**Nginx の場合**
 ```
-LOGDIR=/var/log/httpd/access.log
+LOGDIR=/var/log/nginx/access.log
 ```
 
-## ビルド
+**カスタムログの場合**
+```
+LOGDIR=/path/to/your/access.log
+```
+
+## 実行方法
+
+### 方法1: ビルドせずに直接実行（推奨）
+
+**Goを知らなくても大丈夫！** 以下のコマンドを実行するだけです：
+
+```bash
+go run .
+```
+
+このコマンドで、依存関係の自動ダウンロード→ビルド→実行が一度に行われます。
+
+### 方法2: ビルドしてから実行
+
+ビルド済みの実行ファイルを作成したい場合：
 
 ```bash
 go build -o getData
-```
-
-## 実行
-
-```bash
 ./getData
 ```
+
+### 停止方法
 
 プログラムを停止するには`Ctrl+C`を押してください。
 
